@@ -1,0 +1,9 @@
+Controls:
+Arrow Keys: move and crouch
+X: jump
+z: shoot and run
+p: pause
+f1: window mode at menu
+f2: full screen
+
+?? - invincible
