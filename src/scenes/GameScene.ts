@@ -1661,15 +1661,15 @@ export class GameScene extends Phaser.Scene {
     const ld = LEVEL_DESIGNS[lvl];
     const xs = this.xScroll;
 
-    // Background
-    this.drawSprite('panorama_bg_' + lvl, -(xs / 30), 0);
-    // Foreground parallax
+    // Background (depth 0)
+    this.drawSprite('panorama_bg_' + lvl, -(xs / 30), 0, 0);
+    // Foreground parallax (depth 0)
     for (let i = 0; i < 10; i++) {
-      this.drawSprite('panorama_' + lvl, this.backgroundScroll[i], 0);
+      this.drawSprite('panorama_' + lvl, this.backgroundScroll[i], 0, 0);
     }
 
-    // Castle
-    this.drawSprite('small_castle', ld.castlePosition - xs, 192);
+    // Castle (depth 1)
+    this.drawSprite('small_castle', ld.castlePosition - xs, 192, 1);
 
     // ── Tile rendering ────────────────────────────────────────
     const startCol = Math.floor(xs / TILE_SIZE);
@@ -1682,29 +1682,29 @@ export class GameScene extends Phaser.Scene {
 
         switch (tile) {
           case TileType.GROUND_SOIL:
-            this.drawSprite(`in_ground_${lvl}_${j % 5}`, tx, ty);
+            this.drawSprite(`in_ground_${lvl}_${j % 5}`, tx, ty, 2);
             break;
           case TileType.GROUND_GRASS:
-            this.drawSprite(`out_ground_${lvl}_${j % 3}`, tx, ty);
+            this.drawSprite(`out_ground_${lvl}_${j % 3}`, tx, ty, 2);
             break;
           case TileType.BRICK:
-            this.drawSprite(ld.backgroundType === 1 ? 'night_brick' : 'brick', tx, ty);
+            this.drawSprite(ld.backgroundType === 1 ? 'night_brick' : 'brick', tx, ty, 2);
             break;
           case TileType.QUESTION_BOX:
           case TileType.SHROOM_BOX: {
             const frame = Math.floor(this.goombaSpriteCounter / 20);
-            this.drawSprite(frame === 2 ? 'box_d' : frame === 1 ? 'box_l' : 'box_m', tx, ty);
+            this.drawSprite(frame === 2 ? 'box_d' : frame === 1 ? 'box_l' : 'box_m', tx, ty, 2);
             break;
           }
-          case TileType.TUBE_EXT_LEFT: this.drawSprite('tube_ext_left', tx, ty); break;
-          case TileType.TUBE_EXT_RIGHT: this.drawSprite('tube_ext_right', tx, ty); break;
-          case TileType.TUBE_TOP_LEFT: this.drawSprite('tube_top_left', tx, ty); break;
-          case TileType.TUBE_TOP_RIGHT: this.drawSprite('tube_top_right', tx, ty); break;
-          case TileType.BLOCK: this.drawSprite('block', tx, ty); break;
-          case TileType.EMPTY_BOX: this.drawSprite('box_hit', tx, ty); break;
-          case TileType.POLE: this.drawSprite('pole', tx, ty); break;
-          case TileType.POLE_HEAD: this.drawSprite('pole_head', tx, ty); break;
-          case TileType.UP_BRICK: this.drawSprite(ld.backgroundType === 1 ? 'night_brick' : 'brick', tx, ty - 5); break;
+          case TileType.TUBE_EXT_LEFT: this.drawSprite('tube_ext_left', tx, ty, 2); break;
+          case TileType.TUBE_EXT_RIGHT: this.drawSprite('tube_ext_right', tx, ty, 2); break;
+          case TileType.TUBE_TOP_LEFT: this.drawSprite('tube_top_left', tx, ty, 2); break;
+          case TileType.TUBE_TOP_RIGHT: this.drawSprite('tube_top_right', tx, ty, 2); break;
+          case TileType.BLOCK: this.drawSprite('block', tx, ty, 2); break;
+          case TileType.EMPTY_BOX: this.drawSprite('box_hit', tx, ty, 2); break;
+          case TileType.POLE: this.drawSprite('pole', tx, ty, 2); break;
+          case TileType.POLE_HEAD: this.drawSprite('pole_head', tx, ty, 2); break;
+          case TileType.UP_BRICK: this.drawSprite(ld.backgroundType === 1 ? 'night_brick' : 'brick', tx, ty - 5, 2); break;
         }
       }
     }
@@ -1719,43 +1719,43 @@ export class GameScene extends Phaser.Scene {
         if (ox < -100 || ox > SCREEN_WIDTH + 100) continue;
 
         switch (i) {
-          case ObjectType.METEOR: this.drawSprite('sky_fire', ox, oy); break;
-          case ObjectType.MUSHROOM: this.drawSpriteClip('mushroom', ox, oy, obj.width, obj.height); break;
+          case ObjectType.METEOR: this.drawSprite('sky_fire', ox, oy, 3); break;
+          case ObjectType.MUSHROOM: this.drawSpriteClip('mushroom', ox, oy, obj.width, obj.height, 3); break;
           case ObjectType.GOOMBA:
-            this.drawSprite(Math.floor(this.goombaSpriteCounter / 10) % 2 === 0 ? 'goomba_l' : 'goomba_r', ox, oy);
+            this.drawSprite(Math.floor(this.goombaSpriteCounter / 10) % 2 === 0 ? 'goomba_l' : 'goomba_r', ox, oy, 3);
             break;
           case ObjectType.TURTLE:
             if (obj.life === 2) {
               const frame2 = Math.floor(this.goombaSpriteCounter / 10) % 2;
-              if (obj.move > 0) this.drawSprite(frame2 === 0 ? 'turtle_r1' : 'turtle_r2', ox, oy);
-              else this.drawSprite(frame2 === 0 ? 'turtle_l1' : 'turtle_l2', ox, oy);
+              if (obj.move > 0) this.drawSprite(frame2 === 0 ? 'turtle_r1' : 'turtle_r2', ox, oy, 3);
+              else this.drawSprite(frame2 === 0 ? 'turtle_l1' : 'turtle_l2', ox, oy, 3);
             } else {
-              this.drawSprite('turtle_shell', ox, oy);
+              this.drawSprite('turtle_shell', ox, oy, 3);
             }
             break;
           case ObjectType.FLOWER: {
             const fkey = Math.floor(this.goombaSpriteCounter / 30) % 2 === 0 ? 'flower2' : 'flower1';
-            this.drawSpriteClip(fkey, ox, oy, obj.width, obj.height);
+            this.drawSpriteClip(fkey, ox, oy, obj.width, obj.height, 3);
             break;
           }
           case ObjectType.COIN: {
             const cf = Math.floor(this.goombaSpriteCounter / 20);
-            this.drawSprite(cf === 2 ? 'coin_d' : cf === 1 ? 'coin_l' : 'coin_m', ox, oy);
+            this.drawSprite(cf === 2 ? 'coin_d' : cf === 1 ? 'coin_l' : 'coin_m', ox, oy, 3);
             break;
           }
-          case ObjectType.BUTTON: this.drawSprite('button', ox, oy); break;
+          case ObjectType.BUTTON: this.drawSprite('button', ox, oy, 3); break;
           case ObjectType.BOWSER: {
             if (obj.down === 0) {
-              this.drawSprite(Math.floor(this.goombaSpriteCounter / 10) % 2 === 0 ? 'bowser_walk1' : 'bowser_walk2', ox, oy);
+              this.drawSprite(Math.floor(this.goombaSpriteCounter / 10) % 2 === 0 ? 'bowser_walk1' : 'bowser_walk2', ox, oy, 3);
             } else if (obj.yPos <= 352) {
-              this.drawSprite('bowser_jump', ox, oy);
+              this.drawSprite('bowser_jump', ox, oy, 3);
             } else {
-              this.drawSprite('bowser_fall', ox, oy);
+              this.drawSprite('bowser_fall', ox, oy, 3);
             }
             break;
           }
-          case ObjectType.FLAG_POLE: this.drawSprite('flag_pole', ox, oy); break;
-          case ObjectType.CANNON: this.drawSprite('cannon_bullet', ox, oy); break;
+          case ObjectType.FLAG_POLE: this.drawSprite('flag_pole', ox, oy, 3); break;
+          case ObjectType.CANNON: this.drawSprite('cannon_bullet', ox, oy, 3); break;
         }
       }
     }
@@ -1780,27 +1780,27 @@ export class GameScene extends Phaser.Scene {
       for (let j = 0; j < MAX_OBJECTS; j++) {
         const anim = this.animations[i][j];
         if (anim.life > 0 && animKeys[i]) {
-          this.drawSprite(animKeys[i], anim.xPos - xs, anim.yPos);
+          this.drawSprite(animKeys[i], anim.xPos - xs, anim.yPos, 4);
         }
       }
     }
 
-    // ── Fireballs ─────────────────────────────────────────────
+    // ── Fireballs (depth 5) ────────────────────────────────────
     for (let j = 0; j < MAX_BULLETS; j++) {
       const b = this.bullets[j];
       if (b.life > 0) {
         const ff = Math.floor(this.goombaSpriteCounter / 15);
         const fk = ff === 1 ? 'fireball1' : ff === 2 ? 'fireball2' : ff === 3 ? 'fireball3' : 'fireball4';
-        this.drawSprite(fk, b.xPos - xs, b.yPos);
+        this.drawSprite(fk, b.xPos - xs, b.yPos, 5);
       }
     }
 
-    // ── Mario ─────────────────────────────────────────────────
+    // ── Mario (depth 6) ────────────────────────────────────────
     if ((this.mario.xPos + this.mario.width) < (ld.castlePosition + 95)) {
       if (this.marioTransform && Math.floor(this.goombaSpriteCounter / 10) % 2 !== 0) {
-        this.drawSprite('flash_mario', this.marioScrollPosition, this.mario.yPos);
+        this.drawSprite('flash_mario', this.marioScrollPosition, this.mario.yPos, 6);
       } else if (this.mario.life === MarioState.DEAD) {
-        this.drawSprite('dead_mario', this.marioScrollPosition, this.mario.yPos);
+        this.drawSprite('dead_mario', this.marioScrollPosition, this.mario.yPos, 6);
       } else {
         this.drawMarioSprite();
       }
@@ -1830,63 +1830,64 @@ export class GameScene extends Phaser.Scene {
 
     if (this.mario.life === MarioState.SMALL) {
       if (this.marioFacing === 1) {
-        if (dc === 0) this.drawSprite('small_jump_r', mx, my);
-        else if (mv > 1 && wc === 0) this.drawSprite('small_walk_r_1', mx, my);
-        else if (mv > 1 && (wc === 1 || wc === 3)) this.drawSprite('small_walk_r_2', mx, my);
-        else if (mv < 0) this.drawSprite('small_turn_r', mx, my);
-        else this.drawSprite('small_stand_r', mx, my);
+        if (dc === 0) this.drawSprite('small_jump_r', mx, my, 6);
+        else if (mv > 1 && wc === 0) this.drawSprite('small_walk_r_1', mx, my, 6);
+        else if (mv > 1 && (wc === 1 || wc === 3)) this.drawSprite('small_walk_r_2', mx, my, 6);
+        else if (mv < 0) this.drawSprite('small_turn_r', mx, my, 6);
+        else this.drawSprite('small_stand_r', mx, my, 6);
       } else {
-        if (dc === 0) this.drawSprite('small_jump_l', mx, my);
-        else if (mv < -1 && wc === 0) this.drawSprite('small_walk_l_1', mx, my);
-        else if (mv < -1 && (wc === 1 || wc === 3)) this.drawSprite('small_walk_l_2', mx, my);
-        else if (mv > 0) this.drawSprite('small_turn_l', mx, my);
-        else this.drawSprite('small_stand_l', mx, my);
+        if (dc === 0) this.drawSprite('small_jump_l', mx, my, 6);
+        else if (mv < -1 && wc === 0) this.drawSprite('small_walk_l_1', mx, my, 6);
+        else if (mv < -1 && (wc === 1 || wc === 3)) this.drawSprite('small_walk_l_2', mx, my, 6);
+        else if (mv > 0) this.drawSprite('small_turn_l', mx, my, 6);
+        else this.drawSprite('small_stand_l', mx, my, 6);
       }
     } else if (this.mario.life === MarioState.BIG) {
       if (this.marioFacing === 1) {
-        if (this.duckMode) this.drawSprite('large_duck_r', mx, my);
-        else if (dc === 0) this.drawSprite('large_jump_r', mx, my);
-        else if (mv > 1 && wc === 0) this.drawSprite('large_walk_r_1', mx, my);
-        else if (mv > 1 && (wc === 1 || wc === 3)) this.drawSprite('large_walk_r_2', mx, my);
-        else if (mv < 0) this.drawSprite('large_turn_r', mx, my);
-        else this.drawSprite('large_stand_r', mx, my);
+        if (this.duckMode) this.drawSprite('large_duck_r', mx, my, 6);
+        else if (dc === 0) this.drawSprite('large_jump_r', mx, my, 6);
+        else if (mv > 1 && wc === 0) this.drawSprite('large_walk_r_1', mx, my, 6);
+        else if (mv > 1 && (wc === 1 || wc === 3)) this.drawSprite('large_walk_r_2', mx, my, 6);
+        else if (mv < 0) this.drawSprite('large_turn_r', mx, my, 6);
+        else this.drawSprite('large_stand_r', mx, my, 6);
       } else {
-        if (this.duckMode) this.drawSprite('large_duck_l', mx, my);
-        else if (dc === 0) this.drawSprite('large_jump_l', mx, my);
-        else if (mv < -1 && wc === 0) this.drawSprite('large_walk_l_1', mx, my);
-        else if (mv < -1 && (wc === 1 || wc === 3)) this.drawSprite('large_walk_l_2', mx, my);
-        else if (mv > 0) this.drawSprite('large_turn_l', mx, my);
-        else this.drawSprite('large_stand_l', mx, my);
+        if (this.duckMode) this.drawSprite('large_duck_l', mx, my, 6);
+        else if (dc === 0) this.drawSprite('large_jump_l', mx, my, 6);
+        else if (mv < -1 && wc === 0) this.drawSprite('large_walk_l_1', mx, my, 6);
+        else if (mv < -1 && (wc === 1 || wc === 3)) this.drawSprite('large_walk_l_2', mx, my, 6);
+        else if (mv > 0) this.drawSprite('large_turn_l', mx, my, 6);
+        else this.drawSprite('large_stand_l', mx, my, 6);
       }
     } else if (this.mario.life === MarioState.FIRE) {
       if (this.marioFacing === 1) {
-        if (this.duckMode) this.drawSprite('fire_duck_r', mx, my);
-        else if (dc === 0) this.drawSprite('fire_jump_r', mx, my);
-        else if (mv > 1 && wc === 0) this.drawSprite('fire_walk_r_1', mx, my);
-        else if (mv > 1 && (wc === 1 || wc === 3)) this.drawSprite('fire_walk_r_2', mx, my);
-        else if (mv < 0) this.drawSprite('fire_turn_r', mx, my);
-        else this.drawSprite('fire_stand_r', mx, my);
+        if (this.duckMode) this.drawSprite('fire_duck_r', mx, my, 6);
+        else if (dc === 0) this.drawSprite('fire_jump_r', mx, my, 6);
+        else if (mv > 1 && wc === 0) this.drawSprite('fire_walk_r_1', mx, my, 6);
+        else if (mv > 1 && (wc === 1 || wc === 3)) this.drawSprite('fire_walk_r_2', mx, my, 6);
+        else if (mv < 0) this.drawSprite('fire_turn_r', mx, my, 6);
+        else this.drawSprite('fire_stand_r', mx, my, 6);
       } else {
-        if (this.duckMode) this.drawSprite('fire_duck_l', mx, my);
-        else if (dc === 0) this.drawSprite('fire_jump_l', mx, my);
-        else if (mv < -1 && wc === 0) this.drawSprite('fire_walk_l_1', mx, my);
-        else if (mv < -1 && (wc === 1 || wc === 3)) this.drawSprite('fire_walk_l_2', mx, my);
-        else if (mv > 0) this.drawSprite('fire_turn_l', mx, my);
-        else this.drawSprite('fire_stand_l', mx, my);
+        if (this.duckMode) this.drawSprite('fire_duck_l', mx, my, 6);
+        else if (dc === 0) this.drawSprite('fire_jump_l', mx, my, 6);
+        else if (mv < -1 && wc === 0) this.drawSprite('fire_walk_l_1', mx, my, 6);
+        else if (mv < -1 && (wc === 1 || wc === 3)) this.drawSprite('fire_walk_l_2', mx, my, 6);
+        else if (mv > 0) this.drawSprite('fire_turn_l', mx, my, 6);
+        else this.drawSprite('fire_stand_l', mx, my, 6);
       }
     }
   }
 
-  private drawSprite(key: string, x: number, y: number): void {
+  private drawSprite(key: string, x: number, y: number, depth = 1): void {
     if (this.spritePoolIndex >= this.spritePool.length) {
       const sp = this.add.image(0, 0, key).setOrigin(0, 0);
       this.spritePool.push(sp);
     }
     const sp = this.spritePool[this.spritePoolIndex++];
-    sp.setTexture(key).setPosition(x, y).setVisible(true).setDepth(1).setCrop(0, 0, 9999, 9999);
+    sp.setTexture(key).setPosition(x, y).setVisible(true).setDepth(depth);
+    sp.setCrop();
   }
 
-  private drawSpriteClip(key: string, x: number, y: number, w: number, h: number): void {
+  private drawSpriteClip(key: string, x: number, y: number, w: number, h: number, depth = 2): void {
     if (this.spritePoolIndex >= this.spritePool.length) {
       const sp = this.add.image(0, 0, key).setOrigin(0, 0);
       this.spritePool.push(sp);
@@ -1896,7 +1897,7 @@ export class GameScene extends Phaser.Scene {
     const frame = tex.get();
     const fullH = frame.height;
     const clipY = fullH - h;
-    sp.setTexture(key).setPosition(x, y).setVisible(true).setDepth(1);
+    sp.setTexture(key).setPosition(x, y).setVisible(true).setDepth(depth);
     sp.setCrop(0, clipY, w, h);
   }
 
