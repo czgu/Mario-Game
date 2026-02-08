@@ -132,6 +132,9 @@ export class GameScene extends Phaser.Scene {
     t: Phaser.Input.Keyboard.Key;
   };
 
+  // Music
+  private levelMusic?: Phaser.Sound.BaseSound;
+
   // Rendering pool
   private spritePool: Phaser.GameObjects.Image[] = [];
   private spritePoolIndex = 0;
@@ -151,6 +154,13 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Reset display pools from previous scene lifecycle (Phaser reuses scene objects)
+    this.spritePool = [];
+    this.spritePoolIndex = 0;
+    this.scoreTexts = [];
+    this.scoreTextIndex = 0;
+    this.hudTexts = [];
+
     // Initialize arrays
     this.objects = [];
     for (let i = 0; i < 10; i++) {
@@ -242,6 +252,17 @@ export class GameScene extends Phaser.Scene {
     this.marioSpriteCounter = 0;
     this.inertiaCounter = 0;
     this.globalScoreCounter = 0;
+
+    // Play level music
+    try {
+      this.levelMusic = this.sound.add('level1_music', { loop: true });
+      this.levelMusic.play();
+    } catch { /* audio may fail silently */ }
+
+    // Stop music on scene shutdown
+    this.events.once('shutdown', () => {
+      this.levelMusic?.stop();
+    });
   }
 
   update(_time: number, _delta: number): void {
@@ -543,6 +564,7 @@ export class GameScene extends Phaser.Scene {
 
     // ── Death music trigger ───────────────────────────────────
     if (this.mario.life === MarioState.DEAD && this.deathSong && !this.mario.death) {
+      this.levelMusic?.stop();
       this.playSfx('sfx_death');
       this.deathSong = false;
       this.mario.death = true;
@@ -841,7 +863,10 @@ export class GameScene extends Phaser.Scene {
 
         // Mushroom/flower grow animation
         if ((a === ObjectType.MUSHROOM || a === ObjectType.FLOWER) && obj.life > 0) {
-          if (obj.height < 32) obj.height++;
+          if (obj.height < 32) {
+            obj.height++;
+            obj.yPos--;
+          }
           if (obj.height === 31 && a === ObjectType.MUSHROOM) obj.move = 2;
         }
 
@@ -1029,6 +1054,7 @@ export class GameScene extends Phaser.Scene {
 
     if (a === ObjectType.FLAG_POLE) {
       this.levelChangeAnimation = true;
+      this.levelMusic?.stop();
     }
   }
 
@@ -1441,6 +1467,7 @@ export class GameScene extends Phaser.Scene {
 
     if (bowser.life === 0 && this.spawnBrowser) {
       this.gameComplete = true;
+      this.levelMusic?.stop();
     }
   }
 
